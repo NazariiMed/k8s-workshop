@@ -1,0 +1,12 @@
+replicaCount: 1
+
+db:
+  name: simple-crud-db
+  username: admin
+  password: password
+  dbName: simple-crud
+  port: "5432"
+
+app:
+  name: simple-crud
+  port: "8080"

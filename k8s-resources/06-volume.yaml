@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-world-deployment
+  labels:
+    app: hello-world
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: hello-world
+  template:
+    metadata:
+      name: foo-app
+      labels:
+        app: hello-world
+    spec:
+      containers:
+        - image: nazarmedykh/hello-world:v1
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: foo
+              mountPath: /data  # in the container filesystem
+          name: app
+          livenessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            httpGet:
+              path: /helloWorld
+              port: 8080
+          readinessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            httpGet:
+              path: /helloWorld
+              port: 8080
+      volumes:
+        - name: foo
+          hostPath:
+            path: /tmp/hello-world  # matches kind containerPath:

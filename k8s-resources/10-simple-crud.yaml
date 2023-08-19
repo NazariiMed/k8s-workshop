@@ -1,0 +1,116 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: simple-crud
+  labels:
+    app: simple-crud
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: simple-crud
+  template:
+    metadata:
+      name: simple-crud
+      labels:
+        app: simple-crud
+    spec:
+      containers:
+        - image: nazarmedykh/simple-crud:v1
+          imagePullPolicy: Always
+          name: app
+          livenessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            httpGet:
+              path: /actuator/health
+              port: 8080
+          readinessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            httpGet:
+              path: /actuator/health
+              port: 8080
+          env:
+            - name: FG_DB_HOST
+              value: simple-crud-db.default.svc.cluster.local
+            - name: FG_DB_PORT
+              value: "5432"
+            - name: FG_DB_NAME
+              value: "simple-crud"
+            - name: FG_DB_USER
+              value: "admin"
+            - name: FG_DB_PASS
+              value: "password"
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: simple-crud
+spec:
+  selector:
+    app: simple-crud
+  ports:
+    - port: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: simple-crud-db
+  labels:
+    app: simple-crud-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: simple-crud-db
+  template:
+    metadata:
+      name: simple-crud-db
+      labels:
+        app: simple-crud-db
+    spec:
+      containers:
+        - image: postgres:15
+          imagePullPolicy: Always
+          name: db
+          env:
+            - name: POSTGRES_DB
+              value: simple-crud
+            - name: POSTGRES_USER
+              value: admin
+            - name: POSTGRES_PASSWORD
+              value: password
+#          volumeMounts:
+#            - name: data
+#              mountPath: /var/lib/postgresql/data
+#      volumes:
+#        - name: data
+#          hostPath:
+#            path: /tmp/postgres
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: simple-crud-db
+spec:
+  selector:
+    app: simple-crud-db
+  ports:
+    - port: 5432
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: simple-crud-ingress
+spec:
+  rules:
+    - http:
+        paths:
+          - pathType: Prefix
+            path: /
+            backend:
+              service:
+                name: simple-crud
+                port:
+                  number: 8080

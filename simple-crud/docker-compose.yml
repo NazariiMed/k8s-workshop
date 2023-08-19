@@ -1,0 +1,27 @@
+version: "3.9"
+
+volumes:
+  simple-crud:
+    driver: local
+
+services:
+  postgres:
+    image: postgres:15
+    volumes:
+      - simple-crud:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: simple-crud
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+    ports:
+      - 5432:5432
+  be:
+    image: nazarmedykh/simple-crud:v1
+    environment:
+      FG_DB_HOST: postgres
+      FG_DB_PORT: 5432
+      FG_DB_NAME: simple-crud
+      FG_DB_USER: admin
+      FG_DB_PASS: password
+    ports:
+      - 8080:8080

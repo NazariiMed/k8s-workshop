@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-world-deployment
+  labels:
+    app: hello-world
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1 #number of pods over the desired
+      maxUnavailable: 1 #can be defined in % (25%)
+  selector:
+    matchLabels:
+      app: hello-world
+  template:
+    metadata:
+      name: foo-app
+      labels:
+        app: hello-world
+    spec:
+      containers:
+        - image: nazarmedykh/hello-world:v1
+          imagePullPolicy: Always
+          name: app
+          livenessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            httpGet:
+              path: /helloWorld
+              port: 8080
+          readinessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            httpGet:
+              path: /helloWorld
+              port: 8080
+
+
+# kubectl rollout status deployment/hello-world-deployment

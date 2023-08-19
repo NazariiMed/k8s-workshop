@@ -1,0 +1,10 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: foo-app
+  labels:
+    app: hello-world
+spec:
+  containers:
+    - image: nazarmedykh/hello-world:v1
+      name: app

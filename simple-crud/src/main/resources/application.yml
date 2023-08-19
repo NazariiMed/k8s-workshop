@@ -1,0 +1,6 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${FG_DB_HOST}:${FG_DB_PORT}/${FG_DB_NAME}
+    username: ${FG_DB_USER}
+    password: ${FG_DB_PASS}
+    driver-class-name: org.postgresql.Driver

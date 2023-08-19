@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: {{ .Values.env }}
+  name: {{ .Values.db.name }}
+  labels:
+    app: {{ .Values.db.name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.db.name }}
+  template:
+    metadata:
+      name: {{ .Values.db.name }}
+      labels:
+        app: {{ .Values.db.name }}
+    spec:
+      containers:
+        - image: postgres:15
+          imagePullPolicy: Always
+          name: db
+          env:
+            - name: POSTGRES_DB
+              value: {{ .Values.db.dbName }}
+            - name: POSTGRES_USER
+              value: {{ .Values.db.username }}
+            - name: POSTGRES_PASSWORD
+              value: {{ .Values.db.password }}
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: data
+          hostPath:
+            path: /tmp/postgres

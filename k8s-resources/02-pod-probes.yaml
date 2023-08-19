@@ -1,0 +1,23 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: foo-app
+  labels:
+    app: hello-world
+spec:
+  containers:
+    - image: nazarmedykh/hello-world:v1
+      imagePullPolicy: Always
+      name: app
+      livenessProbe:
+        initialDelaySeconds: 10
+        periodSeconds: 5
+        httpGet:
+          path: /helloWorld
+          port: 8080
+      readinessProbe:
+        initialDelaySeconds: 10
+        periodSeconds: 5
+        httpGet:
+          path: /helloWorld
+          port: 8080

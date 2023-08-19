@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.app.name }}
+  namespace: {{ .Values.env }}
+  labels:
+    app: {{ .Values.app.name }}
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: {{ .Values.app.name }}
+  template:
+    metadata:
+      name: {{ .Values.app.name }}
+      labels:
+        app: {{ .Values.app.name }}
+    spec:
+      containers:
+        - image: nazarmedykh/simple-crud:v1
+          imagePullPolicy: Always
+          name: app
+          livenessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            httpGet:
+              path: /actuator/health
+              port: 8080
+          readinessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            httpGet:
+              path: /actuator/health
+              port: 8080
+          env:
+            - name: FG_DB_HOST
+              value: {{ .Values.db.name }}.{{ .Values.env }}.svc.cluster.local
+            - name: FG_DB_PORT
+              value: "{{ .Values.db.port }}"
+            - name: FG_DB_NAME
+              value: {{ .Values.db.dbName }}
+            - name: FG_DB_USER
+              value: {{ .Values.db.username }}
+            - name: FG_DB_PASS
+              value: {{ .Values.db.password }}
+---
